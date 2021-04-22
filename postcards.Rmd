@@ -1,0 +1,27 @@
+---
+title: "Who Should We Send Postcards To?"
+date: "April 21, 2024"
+author: Your Name
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+library(tidyverse)
+library(janitor)
+library(gt)
+library(gtsummary)
+library(rstanarm)
+library(ggthemes)
+library(tidybayes)
+library(ggdist)
+
+x <- read_rds("pa.rds")
+```
+
+
+
+
+
