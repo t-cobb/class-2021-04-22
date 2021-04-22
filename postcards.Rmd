@@ -21,7 +21,7 @@ library(ggdist)
 x <- read_rds("pa.rds")
 ```
 
-
+*We have enough money to send out 10,000 postcards. If our goal is to maximize the number of voters, what kind of cards should we send out and to whom?*
 
 
 
