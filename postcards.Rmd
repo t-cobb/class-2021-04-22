@@ -1,7 +1,7 @@
 ---
 title: "Who Should We Send Postcards To?"
 date: "April 21, 2024"
-author: Your Name
+author: Trevor Cobb
 output: html_document
 ---
 
@@ -22,5 +22,57 @@ x <- read_rds("pa.rds")
 
 *What sort of model should you estimate to determine who to send out postcards to if your goal is send them out to people who are most likely to vote? Who do you send out the cards to? How sure are you about what will happen? Temperance!*
 
+
+```{r}
+fit_1 <- stan_glm(voted_2020_primary ~ treat*vote_history + treat*party + treat*sex + treat*age_bin + treat*vote_history,
+                  data = x,
+                  refresh = 0,
+                  seed = 54)
+```
+
+```{r}
+treat <- unique(x$treat)
+vote_history <- unique(x$vote_history)
+age_bin <- unique(x$age_bin)
+sex <- unique(x$sex)
+party <- unique(x$party)
+
+newobs <- expand_grid(treat, vote_history, age_bin, sex, party) %>%
+  as_tibble()
+
+pe <- posterior_epred(fit_1, 
+                newdata = newobs) %>%
+  as_tibble()
+
+```
+
+
+```{r tidybayes, message=FALSE, warning=FALSE}
+
+# if we're just doing predictive, not causal we should use this for our final project 
+
+z <- add_fitted_draws(newobs, fit_1) 
+
+z %>% group_by(treat, party, vote_history, age_bin) %>%
+  summarize(avg = median(.value)) %>%
+  arrange(desc(avg)) 
+ 
+z %>% 
+  filter(treat == c("Neighborhood", "Self", "Control"), 
+         vote_history == "Municipal Primary Voter",
+         sex == "F",
+         party == "Democrat") %>%
+  ggplot(aes(x = .value, 
+             y = as.character(age_bin),
+             fill = treat)) +
+    stat_slab(alpha = 0.5) +
+    labs(title = "Voting probabiltity by age and treatment",
+         subtitle = "Focus on female democrats who vote in municipal primaries", 
+         x = "Expected Probability of Voting",
+         y = "Age",
+         caption = "Source: Barfort, Klemmensen & Larsen (2019)")
+
+
+```
 
 
